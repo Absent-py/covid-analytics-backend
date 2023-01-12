@@ -5,6 +5,7 @@ from psycopg2 import Error
 
 from app import app
 from app.connection import DBConnection
+from app.package import JPackage
 
 CORS(app)
 
@@ -16,7 +17,6 @@ def index():
 
 @app.route('/execute', methods=['POST'])
 def execute():
-    print('lol')
     try:
         query = request.json['query']
         print(query)
@@ -39,16 +39,49 @@ def execute():
             del Connection
 
 
-@app.route('/package')
-def package():
-    print('package')
+@app.route('/package/<table>')
+def package(table):
     try:
         Connection = DBConnection()
-        Connection.cursor.execute('SELECT Count(*) FROM "Resist"')
+        Connection.cursor.execute(f'SELECT Count(*) FROM "{table}"')
         response = Connection.cursor.fetchall()
-        print(response)
-        return response
+        count = {'count': response[0][0]}
+        Package = JPackage()
+        headers = Package.setHeaders(count['count'])
+
+        body = Package.setBody(table)
+        obj = {
+            'headers': headers,
+            'body': body
+        }
+        return obj
     except (Exception, Error) as error:
         print(error)
     finally:
         del Connection
+        del Package
+
+
+@app.route('/death')
+def death():
+    try:
+        Connection = DBConnection()
+        response = Connection.getDeathInfo()
+        percent = []
+        count = 0
+        death_c = 0
+        alive_c = 0
+        for item in response:
+            death_c += item[1]
+            alive_c += item[0]
+            count += 1
+            if (count % 29523) == 0:
+                percent.append(death_c / (alive_c + 0.00000001))
+                death_c = 0
+                alive_c = 0
+        return percent
+    except (Exception, Error) as error:
+        return error
+    finally:
+        if 'Connection' in locals():
+            del Connection

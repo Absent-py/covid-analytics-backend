@@ -25,3 +25,11 @@ class DBConnection:
             self.cursor.close()
             self.connection.close()
             print("PostgreSQL connection closed")
+
+    def getPackage(self, band, table, size):
+        self.cursor.execute(f'SELECT * FROM "{table}" Order by "id" OFFSET {band[0] - 1} ROWS FETCH NEXT {size} ROWS ONLY')
+        return self.cursor.fetchall()
+
+    def getDeathInfo(self):
+        self.cursor.execute(f'SELECT positive_cases, death_count FROM "Activity" Order By "date" OFFSET 10 ROWS')
+        return self.cursor.fetchall()
