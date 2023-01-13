@@ -76,9 +76,38 @@ def death():
             alive_c += item[0]
             count += 1
             if (count % 29523) == 0:
-                percent.append(death_c / (alive_c + 0.00000001))
+                percent.append(death_c / (alive_c + 0.00000001) * 100)
                 death_c = 0
                 alive_c = 0
+        return percent
+    except (Exception, Error) as error:
+        return error
+    finally:
+        if 'Connection' in locals():
+            del Connection
+
+
+@app.route('/death/diff')
+def deathDiff():
+    try:
+        Connection = DBConnection()
+        response = Connection.getDeathInfo()
+        percent = []
+        count = 0
+        death_c = 0
+        alive_c = 0
+        for item in response:
+            death_c += item[1]
+            alive_c += item[0]
+            count += 1
+            if (count % 29523) == 0:
+                percent.append(death_c / (alive_c + 0.00000001) * 100)
+                death_c = 0
+                alive_c = 0
+        for i in range(99):
+            percent[i] = percent[i + 1] - percent[i]
+        percent[99] = 0
+        print(percent)
         return percent
     except (Exception, Error) as error:
         return error
