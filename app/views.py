@@ -114,3 +114,47 @@ def deathDiff():
     finally:
         if 'Connection' in locals():
             del Connection
+
+
+@app.route('/positive_cases')
+def positiveCases():
+    try:
+        Connection = DBConnection()
+        response = Connection.getPositiveCasesInfo()
+        percent = []
+        count = 0
+        cases = 0
+        alive_c = 0
+        for item in response:
+            cases += item[0]
+            count += 1
+            if (count % 29523) == 0:
+                percent.append(cases)
+                cases = 0
+        print(percent)
+        return percent
+    except (Exception, Error) as error:
+        return error
+    finally:
+        if 'Connection' in locals():
+            del Connection
+
+
+@app.route('/resistance')
+def resistance():
+    try:
+        Connection = DBConnection()
+        response = Connection.getResistanceInfo()
+        array = []
+        for item in response:
+            if item[1] > 1:
+                array.append({
+                    'method': item[0],
+                    'count': item[1]
+                })
+        return array
+    except (Exception, Error) as error:
+        return error
+    finally:
+        if 'Connection' in locals():
+            del Connection
