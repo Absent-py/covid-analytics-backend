@@ -6,6 +6,7 @@ from psycopg2 import Error
 from app import app
 from app.connection import DBConnection
 from app.package import JPackage
+from app.helpers import toRange
 
 CORS(app)
 
@@ -163,6 +164,28 @@ def resistance():
                 'counts': counts,
             }
             response.append(response_field)
+        return response
+    except (Exception, Error) as error:
+        return error
+    finally:
+        if 'Connection' in locals():
+            del Connection
+
+
+@app.route('/geo')
+def geo():
+    try:
+        Connection = DBConnection()
+        data = Connection.getGeoInfo()
+        response = []
+        for item in data:
+            if item[0] > 0:
+                response.append({
+                    'x': item[2],
+                    'y': item[1],
+                    'r': toRange(item[0]),
+                    # 'r': 5
+                })
         return response
     except (Exception, Error) as error:
         return error

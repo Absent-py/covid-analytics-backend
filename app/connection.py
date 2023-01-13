@@ -42,3 +42,7 @@ class DBConnection:
     def getResistanceInfo(self, field):
         self.cursor.execute(f'SELECT {field}, Count({field}) FROM "Resist" Group By "{field}" Order by Count({field}) DESC LIMIT 100')
         return self.cursor.fetchall()
+
+    def getGeoInfo(self):
+        self.cursor.execute(f'SELECT SUM(cases), lat, lon FROM "Cases" Group by lat, lon Order by SUM(cases) LIMIT 5000')
+        return self.cursor.fetchall()
