@@ -144,15 +144,26 @@ def positiveCases():
 def resistance():
     try:
         Connection = DBConnection()
-        response = Connection.getResistanceInfo()
-        array = []
-        for item in response:
-            if item[1] > 1:
-                array.append({
-                    'method': item[0],
-                    'count': item[1]
-                })
-        return array
+        fields = [
+            'prov_category',
+            'prov_mesuare',
+            'who_mesuare',
+            'who_mesuare',
+        ]
+        response = []
+        for field in fields:
+            data = Connection.getResistanceInfo(field)
+            methods = []
+            counts = []
+            for item in data:
+                methods.append(item[0])
+                counts.append(item[1])
+            response_field = {
+                'methods': methods,
+                'counts': counts,
+            }
+            response.append(response_field)
+        return response
     except (Exception, Error) as error:
         return error
     finally:

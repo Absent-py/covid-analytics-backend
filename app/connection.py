@@ -39,6 +39,6 @@ class DBConnection:
         self.cursor.execute(f'SELECT positive_cases_new FROM "Activity" Order By "date" OFFSET 10 ROWS')
         return self.cursor.fetchall()
 
-    def getResistanceInfo(self):
-        self.cursor.execute(f'SELECT prov_mesuare, Count(prov_mesuare) FROM "Resist" Group By "prov_mesuare" Order by Count(prov_mesuare) DESC LIMIT 100')
+    def getResistanceInfo(self, field):
+        self.cursor.execute(f'SELECT {field}, Count({field}) FROM "Resist" Group By "{field}" Order by Count({field}) DESC LIMIT 100')
         return self.cursor.fetchall()
